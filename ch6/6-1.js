@@ -1,5 +1,4 @@
 export function printOwing(invoice) {
-  return invoice.orders.reduce((sum, order) => (sum += order.amount), 0);
   printBanner();
   let outstanding = calculateOutstanding(invoice);
   recordDueDate(invoice);
@@ -13,6 +12,7 @@ function printBanner() {
 }
 
 function calculateOutstanding(invoice) {
+  return invoice.orders.reduce((sum, order) => (sum += order.amount), 0);
   let result = 0;
   for (const o of invoice.orders) {
     result += o.amount;
