@@ -1,32 +1,32 @@
 import fs from "fs";
 
-checkFileName();
-const fileName = `./${process.argv[2]}.json`;
-checkFileExist(fileName);
-const orders = getOrders(fileName);
-printOrider(orders);
+run(process.argv);
 
-function checkFileName() {
-  if (!process.argv[2]) {
-    throw new Error("파일 이름을 입력하세요");
-  }
+function run(args) {
+  countOrders(parseCommand(args));
 }
 
-function checkFileExist(fileName) {
+function parseCommand(args) {
+  if (!args[2]) {
+    throw new Error("파일 이름을 입력하세요");
+  }
+
+  const fileName = `./${args[2]}.json`;
   if (!fs.existsSync(fileName)) {
     throw new Error("파일이 존재하지 않습니다");
   }
+
+  return {
+    fileName,
+    countReadyOnly: args.includes("-r"),
+  };
 }
 
-function getOrders(fileName) {
+function countOrders({ fileName, countReadyOnly }) {
   const rawData = fs.readFileSync(fileName);
-  return JSON.parse(rawData);
-}
-
-function printOrider(orders) {
-  if (process.argv.includes("-r")) {
-    console.log(orders.filter((order) => order.status === "ready").length);
-  } else {
-    console.log(orders.length);
-  }
+  const orders = JSON.parse(rawData);
+  const filterd = countReadyOnly
+    ? orders.filter((order) => order.status === "ready").length
+    : orders.lengt;
+  console.log(filterd);
 }
