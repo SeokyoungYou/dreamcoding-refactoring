@@ -1,21 +1,8 @@
 export function priceOrder(product, quantity, shippingMethod) {
-  // const basePrice = product.basePrice * quantity;
-
-  // const discount =
-  //   Math.max(quantity - product.discountThreshold, 0) *
-  //   product.basePrice *
-  //   product.discountRate;
-
   const totalBasePrice = product.getTotalBasePrice(quantity);
   const discount = product.getTotalDiscount(quantity);
-
-  // const shippingPerCase = getShippingPerCase(totalBasePrice);
-  // totalBasePrice > shippingMethod.discountThreshold
-  //   ? shippingMethod.discountedFee
-  //   : shippingMethod.feePerCase;
   const shippingCost = shippingMethod.getShippingCost(quantity, totalBasePrice);
-  const price = totalBasePrice - discount + shippingCost;
-  return price;
+  return totalBasePrice - discount + shippingCost;
 }
 
 class Product {
