@@ -17,6 +17,12 @@ class Person {
   set department(arg) {
     this.#department = arg;
   }
+  get manager() {
+    return this.#department.manager;
+  }
+  get chargeCode() {
+    return this.#department.chargeCode;
+  }
 }
 
 export class Department {
@@ -44,7 +50,7 @@ export class Department {
   }
 }
 
-const person = new Person('Tom', new Department('aManager', '999'));
+const person = new Person("Tom", new Department("aManager", "999"));
 console.log(person.name);
 console.log(person.department.manager);
 console.log(person.department.chargeCode);
