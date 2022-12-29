@@ -23,7 +23,7 @@ class Person {
   }
 
   set officeAreaCode(value) {
-    this.#telephoneNumber.areaCode = value;
+    this.#telephoneNumber = new TelephoneNumber(value, this.officeNumber);
   }
 
   get officeNumber() {
@@ -46,15 +46,9 @@ class TelephoneNumber {
   get areaCode() {
     return this.#areaCode;
   }
-  set areaCode(arg) {
-    this.#areaCode = arg;
-  }
 
   get number() {
     return this.#number;
-  }
-  set number(arg) {
-    this.#number = arg;
   }
 
   get toString() {
@@ -62,7 +56,7 @@ class TelephoneNumber {
   }
 }
 
-const person = new Person('엘리', '010', '12345678');
+const person = new Person("엘리", "010", "12345678");
 console.log(person.name);
 console.log(person.officeAreaCode);
 console.log(person.officeNumber);
