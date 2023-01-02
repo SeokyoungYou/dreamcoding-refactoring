@@ -1,8 +1,25 @@
 import { createStatement } from "./createStatement";
 
 export function statement(invoice, plays) {
-  const statement = createStatement(invoice, plays);
-  return rednerPlainText(statement);
+  return rednerPlainText(createStatement(invoice, plays));
+}
+
+function htmlStatement(invoice, plays) {
+  return rednerHTML(createStatement(invoice, plays));
+}
+
+function rednerHTML(statement) {
+  let result = `<h1>청구 내역 (고객명: ${statement.customer})</h1>\n`;
+
+  for (let perf of statement.performances) {
+    result += `  ${perf.play.name}: ${usd(perf.amount / 100)} (${
+      perf.audience
+    }석)\n`;
+  }
+
+  result += `총액: ${usd(statement.totalAmount / 100)}\n`;
+  result += `적립 포인트: ${statement.totalCredits}점\n`;
+  return result;
 }
 
 function rednerPlainText(statement) {
