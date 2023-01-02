@@ -1,37 +1,26 @@
 export function statement(invoice, plays) {
-  return rednerPlainText(invoice, plays);
-}
+  const statement = {};
+  statement.customer = invoice.customer;
+  statement.performances = invoice.performances.map(enrichPerformance);
+  statement.totalAmount = totalAmount(statement.performances);
+  statement.totalCredits = totalCredits(statement.performances);
+  return rednerPlainText(statement, plays);
 
-function rednerPlainText(invoice, plays) {
-  let totalAmount = 0;
-  let result = `청구 내역 (고객명: ${invoice.customer})\n`;
-
-  for (let perf of invoice.performances) {
-    result += `  ${playFor(perf).name}: ${usd(amountFor(perf) / 100)} (${
-      perf.audience
-    }석)\n`;
+  function enrichPerformance(performance) {
+    const result = { ...performance };
+    result.play = playFor(performance);
+    result.amount = amountFor(result);
+    result.credits = creditsFor(result);
+    return result;
   }
-
-  result += `총액: ${usd(totalAmount() / 100)}\n`;
-  result += `적립 포인트: ${totalCredits()}점\n`;
-  return result;
 
   function playFor(performance) {
     return plays[performance.playID];
   }
 
-  function creditsFor(performance) {
-    let result = Math.max(performance.audience - 30, 0);
-    // 희극 관객 5명마다 추가 포인트를 제공한다.
-    if ("comedy" === playFor(performance).type) {
-      result += Math.floor(performance.audience / 5);
-    }
-    return result;
-  }
-
   function amountFor(performance) {
     let result = 0;
-    switch (playFor(perf).type) {
+    switch (performance.play.type) {
       case "tragedy": // 비극
         result = 40000;
         if (performance.audience > 30) {
@@ -46,17 +35,38 @@ function rednerPlainText(invoice, plays) {
         result += 300 * performance.audience;
         break;
       default:
-        throw new Error(`알 수 없는 장르: ${playFor(perf).type}`);
+        throw new Error(`알 수 없는 장르: ${performance.play.type}`);
     }
     return result;
   }
+  function creditsFor(performance) {
+    let result = Math.max(performance.audience - 30, 0);
+    // 희극 관객 5명마다 추가 포인트를 제공한다.
+    if ("comedy" === performance.play.type) {
+      result += Math.floor(performance.audience / 5);
+    }
+    return result;
+  }
+  function totalCredits(performances) {
+    return performances.reduce((sum, p) => (sum += p.credits), 0);
+  }
+  function totalAmount(performances) {
+    return performances.reduce((sum, p) => (sum += p.amount), 0);
+  }
+}
 
-  function totalCredits() {
-    return invoice.performance.reduce((sum, p) => (sum += creditsFor(p)), 0);
+function rednerPlainText(statement, plays) {
+  let result = `청구 내역 (고객명: ${statement.customer})\n`;
+
+  for (let perf of statement.performances) {
+    result += `  ${perf.play.name}: ${usd(perf.amount / 100)} (${
+      perf.audience
+    }석)\n`;
   }
-  function totalAmount() {
-    return invoice.performance.reduce((sum, p) => (sum += amountFor(p)), 0);
-  }
+
+  result += `총액: ${usd(statement.totalAmount / 100)}\n`;
+  result += `적립 포인트: ${statement.totalCredits}점\n`;
+  return result;
 }
 
 function usd(number) {
